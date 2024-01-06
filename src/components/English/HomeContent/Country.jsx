@@ -1,0 +1,73 @@
+import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { scrollTop, ForLazyLoaderImg } from '../../AllFunctions'
+import DivisionDistrictNameEn from '../Country/DivisionDistrictNameEn'
+var lazyloaded = false
+export default function Country() {
+    const [state, setState] = useState([])
+    const [state2, setState2] = useState([])
+    useEffect(() => {
+        axios
+            .get(`${process.env.REACT_APP_API_URL_EN}json/file/generateCategory2.json`)
+            .then(({ data }) => {
+                setState(data.data[0]);
+                setState2(data.data.slice(1, 5));
+                setTimeout(function () {
+                    lazyloaded = false
+                    ForLazyLoaderImg(lazyloaded)
+                }, 1000);
+            });
+    }, [])
+    return (
+        <>
+            <section className="Country">
+                <div className="SPSecTitle En">
+                    <Link to="/english/country" onClick={scrollTop}><h2><img src={process.env.REACT_APP_FONT_DOMAIN_URL + "media/common/Sign.png"} width={16} height={16} alt="Sign" title="Sign" /> Country</h2></Link>
+                </div>
+                <DivisionDistrictNameEn />
+                <div className="DCountry">
+                    <div className="row">
+                        <div className="col-lg-7 col-sm-12">
+                            <div className="DCountryTop En videoIcon">
+                                <Link to={"/english/" + state.Slug + "/" + state.ContentID} onClick={scrollTop}>
+                                    <picture><img src={process.env.REACT_APP_LAZYL_IMG_En} data-src={process.env.REACT_APP_IMG_Path + state.ImageBgPath} alt={state.ContentHeading} title={state.ContentHeading} className="img-fluid img100" /></picture>
+                                    {state.ShowVideo === 1 || state.VideoID !== null ? <span className="play-btn-big"><i className="fas fa-play"></i></span> : ""}
+                                    <div className="Desc">
+                                        <h3 className="Title LeadTitle fw-bold">{state.ContentHeading}</h3>
+                                        <div className="Brief"><p dangerouslySetInnerHTML={{ __html: state.ContentBrief }}></p></div>
+                                    </div>
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="col-lg-5 col-sm-12">
+                            <div className="DCountryTop2 En">
+                                {state2.map((nc) => {
+                                    return (
+                                        <div className="DCountryList" key={nc.ContentID}>
+                                            <Link to={"/english/" + nc.Slug + "/" + nc.ContentID} onClick={scrollTop}>
+                                                <div className="row">
+                                                    <div className="col-lg-5 col-sm-4 col-5 videoIcon">
+                                                        <picture>
+                                                            <img src={process.env.REACT_APP_LAZYL_IMG_En} data-src={process.env.REACT_APP_IMG_Path + nc.ImageSmPath} alt={nc.ContentHeading} title={nc.ContentHeading} className="img-fluid img100" />
+                                                        </picture>
+                                                        {nc.ShowVideo === 1 || nc.VideoID !== null ? <span className="play-btn"><i className="fas fa-play"></i></span> : ""}
+                                                    </div>
+                                                    <div className="col-lg-7 col-sm-8 col-7">
+                                                        <div className="Desc">
+                                                            <h3 className="Title SMTitle">{nc.ContentHeading}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </>
+    )
+}
